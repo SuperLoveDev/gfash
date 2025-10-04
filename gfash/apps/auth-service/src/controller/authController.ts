@@ -198,3 +198,35 @@ export const resetUserPassword = async (
     return next(error);
   }
 };
+
+// **** SELLER ****
+
+// register a new seller
+export const sellerRegistration = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    validateRegistrationData(req.body, "seller");
+    const { name, email } = req.body;
+
+    const existingUser = await prisma.sellers.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new ValidationError("Seller already exist with this email");
+    }
+
+    // check and track seller otp
+    await checkOtpRestrictions(email, next);
+    await trackOtpRequests(email, next);
+    // then send otp to the seller
+    await sendOtp(name, email, "seller-email-activation");
+
+    res.status(200).json({
+      success: true,
+      message: "Votre compte vendeur a été créé avec succès !",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
