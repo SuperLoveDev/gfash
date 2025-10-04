@@ -1,14 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import {
   checkOtpRestrictions,
+  handleForgotPassword,
   sendOtp,
   trackOtpRequests,
   validateRegistrationData,
+  verifyForgotPasswordOtp,
   verifyOtp,
 } from "../utils/auth.helper";
 import { ValidationError } from "../../../../packages/error-handler";
 import prisma from "../../../../packages/libs/Prisma";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { setCookie } from "../utils/Cookies/setCookie";
 
 // register a user and send OTP for email verification
 export const userRegistration = async (
@@ -89,6 +93,107 @@ export const loginUser = async (
     if (!email || !password) {
       return next(new ValidationError("Email et mot de passe sont requis "));
     }
+
+    const user = await prisma.users.findUnique({ where: { email } });
+    if (!user) {
+      return next(new ValidationError("Utilisateur introuvable"));
+    }
+
+    //verify password
+    const isMatch = await bcrypt.compare(password, user.password!);
+    if (!isMatch) {
+      return next(new ValidationError("Email ou Mot de passe invalide"));
+    }
+
+    // generate access and refresh token
+    const accessToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.PROCESS_SECRET_TOKEN as string,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.PROCESS_SECRET_TOKEN as string,
+      {
+        expiresIn: "7d",
+      }
+    );
+    setCookie(res, "access_token", accessToken);
+    setCookie(res, "refresh_token", refreshToken);
+
+    res.status(201).json({
+      message: "Login successfully",
+      user: { id: user.id, email: user.email, name: user.name },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// user forgot password
+export const userForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await handleForgotPassword(req, res, next, "user");
+};
+
+// verify user forgot password
+export const verifyUserForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await verifyForgotPasswordOtp(req, res, next);
+};
+
+// reset user password
+export const resetUserPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return next(
+        new ValidationError(
+          "Merci d’indiquer votre email et un nouveau mot de passe."
+        )
+      );
+    }
+    //checking if the user exist
+    const user = await prisma.users.findUnique({ where: { email } });
+    if (!user) {
+      return next(
+        new ValidationError("Cet email n’est associé à aucun compte.")
+      );
+    }
+
+    // check the new password and old one
+    const isSamePassword = await bcrypt.compare(newPassword, user.password!);
+    if (isSamePassword) {
+      return next(
+        new ValidationError(
+          "Le nouveau mot de passe ne peut pas être identique à l'ancien 8 Merci de choisir un autre mot de passe."
+        )
+      );
+    }
+
+    // hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.users.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    res.status(200).json({
+      message: "Mot de passe réinitialiser avec success !",
+    });
   } catch (error) {
     return next(error);
   }
