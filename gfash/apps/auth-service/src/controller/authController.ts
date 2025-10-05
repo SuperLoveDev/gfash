@@ -268,3 +268,68 @@ export const verifySeller = async (
     return next(error);
   }
 };
+
+// create a boutique
+export const createBoutique = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      name,
+      bio,
+      category,
+      address,
+      shop_contact,
+      opening_hours,
+      website,
+      sellerId,
+    } = req.body;
+
+    if (
+      !name ||
+      !bio ||
+      !category ||
+      !address ||
+      !shop_contact ||
+      !opening_hours ||
+      !sellerId
+    ) {
+      return next(new ValidationError("Tous les champs sont requis !"));
+    }
+
+    const existingSeller = await prisma.sellers.findUnique({
+      where: { id: sellerId },
+    });
+    if (!existingSeller) {
+      return next(new ValidationError("vendeur introuvable"));
+    }
+
+    const shopData: any = {
+      name,
+      bio,
+      category,
+      address,
+      shop_contact,
+      opening_hours,
+      sellerId,
+    };
+
+    // add website when correctly added and to avoid unnecessary space
+    if (website && website.trim() !== "") {
+      shopData.website = website;
+    }
+
+    // create the boutique in the database
+    const boutique = await prisma.shops.create({
+      data: shopData,
+    });
+    res.status(201).json({
+      success: true,
+      boutique,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
