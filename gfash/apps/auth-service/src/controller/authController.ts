@@ -211,8 +211,10 @@ export const sellerRegistration = async (
     validateRegistrationData(req.body, "seller");
     const { name, email } = req.body;
 
-    const existingUser = await prisma.sellers.findUnique({ where: { email } });
-    if (existingUser) {
+    const existingSeller = await prisma.sellers.findUnique({
+      where: { email },
+    });
+    if (existingSeller) {
       throw new ValidationError("Seller already exist with this email");
     }
 
@@ -225,6 +227,42 @@ export const sellerRegistration = async (
     res.status(200).json({
       success: true,
       message: "Votre compte vendeur a été créé avec succès !",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// verify seller
+export const verifySeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, email, password, phone_number, country, otp } = req.body;
+    if (!name || !email || !password || !phone_number || !country || !otp) {
+      return next(new ValidationError("Tous les champs sont requis !"));
+    }
+
+    const existingSeller = await prisma.sellers.findUnique({
+      where: { email },
+    });
+    if (existingSeller) {
+      return next(new ValidationError("Un vendeur existe déja avec cet email"));
+    }
+
+    // verify otp
+    await verifyOtp(email, otp, next);
+    // hash the seller password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const seller = await prisma.sellers.create({
+      data: { name, email, password: hashedPassword, phone_number, country },
+    });
+
+    res.status(200).json({
+      seller,
+      message: "Boutique créé avec success !",
     });
   } catch (error) {
     return next(error);
