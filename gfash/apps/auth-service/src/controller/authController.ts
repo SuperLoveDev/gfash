@@ -75,7 +75,7 @@ export const verifyUser = async (
 
     res.status(201).json({
       success: true,
-      message: "Bienvenue à bord ! Votre compte a été créé avec succès.",
+      message: "Bienvenue ! Votre compte a été créé avec succès.",
     });
   } catch (error) {
     return next(error);
@@ -108,7 +108,7 @@ export const loginUser = async (
     // generate access and refresh token
     const accessToken = jwt.sign(
       { id: user.id, role: "user" },
-      process.env.PROCESS_SECRET_TOKEN as string,
+      process.env.ACCESS_TOKEN_SECRET as string,
       {
         expiresIn: "15m",
       }
@@ -116,7 +116,7 @@ export const loginUser = async (
 
     const refreshToken = jwt.sign(
       { id: user.id, role: "user" },
-      process.env.PROCESS_SECRET_TOKEN as string,
+      process.env.REFESH_TOKEN_SECRET as string,
       {
         expiresIn: "7d",
       }

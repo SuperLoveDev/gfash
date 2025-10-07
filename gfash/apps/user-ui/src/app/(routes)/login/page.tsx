@@ -1,5 +1,7 @@
 "use client";
 import GoogleButton from "@/shared/components/googleButton";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,8 +25,30 @@ const Login = () => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const loginMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/connexion-utilisateur`,
+        data,
+        { withCredentials: true } // withCredentials: true, ensures cookies are sent and received,allowing session persistence across requests.
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setServerError(null);
+      router.push("/");
+    },
+    onError: (error: AxiosError) => {
+      const messageError =
+        (error.response?.data as { message?: string })?.message ||
+        "Identifiants incorrects !";
+      setServerError(messageError);
+    },
+  });
+
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    console.log("📤 Données envoyées:", data);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -64,6 +88,7 @@ const Login = () => {
             </span>
           </div>
 
+          {/* form validation */}
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* email input */}
             <label className="block text-xl mb-1 sm:text-base text-gray-700">
@@ -138,9 +163,10 @@ const Login = () => {
 
             <button
               type="submit"
+              disabled={loginMutation.isPending}
               className="w-full bg-purple-900 mt-5 h-[40px] text-white font-medium text-base sm:text-lg cursor-pointer transition-all duration-300 hover:bg-purple-950"
             >
-              Connexion
+              {loginMutation?.isPending ? "connexion..." : "connexion"}
             </button>
 
             {serverError && (
