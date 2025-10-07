@@ -47,7 +47,6 @@ const Login = () => {
   });
 
   const onSubmit = (data: FormData) => {
-    console.log("📤 Données envoyées:", data);
     loginMutation.mutate(data);
   };
 
@@ -68,7 +67,7 @@ const Login = () => {
           <div className="flex items-center mt-3 justify-center gap-2">
             <p className="text-gray-500">Vous n'avez pas de compte ?</p>
             <Link
-              href={"/signup"}
+              href={"/inscription"}
               className="text-sm sm:text-base font-bold text-purple-900"
             >
               S'inscrire

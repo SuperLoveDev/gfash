@@ -28,13 +28,13 @@ const Header = () => {
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Link
-                href={"/login"}
+                href={"/connexion"}
                 className="w-[50px] h-[50px] border-[2px] border-gray-400 rounded-full flex items-center justify-center"
               >
                 <User color="white" />
               </Link>
 
-              <Link href={"/login"} className="">
+              <Link href={"/connexion"} className="">
                 <span className="block font-medium text-gray-300">
                   Bienvenue,
                 </span>

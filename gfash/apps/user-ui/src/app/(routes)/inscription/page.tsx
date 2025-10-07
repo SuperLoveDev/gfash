@@ -97,7 +97,7 @@ const Signup = () => {
   };
 
   // function to handle otp automatic deletion
-  const handleKeyDown = (
+  const handleOtpKeyDown = (
     index: number,
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -106,7 +106,11 @@ const Signup = () => {
     }
   };
 
-  const resendOtp = () => {};
+  const resendOtp = () => {
+    if (userData) {
+      signupMutation.mutate(userData);
+    }
+  };
 
   return (
     <div className="w-full py-20 min-h-[85vh] bg-white ">
@@ -240,7 +244,7 @@ const Signup = () => {
                     key={index}
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
                     maxLength={1}
                     ref={(el) => {
                       if (el) inputRefs.current[index] = el;
