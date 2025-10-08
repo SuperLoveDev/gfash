@@ -142,21 +142,27 @@ export const refreshToken = async (
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return next(new ValidationError("Unauthorized! NO refresh token"));
+      return next(
+        new ValidationError(
+          "Non autorisé — aucun jeton de rafraîchissement fourni."
+        )
+      );
     }
 
     const decoded = jwt.verify(
       refreshToken,
-      process.env.REFESH_TOKEN_SECRET as string
+      process.env.REFRESH_TOKEN_SECRET as string
     ) as { id: string; role: string };
     if (!decoded || !decoded.id || !decoded.role) {
-      return next(new AuthError("Unauthoried user/seller not found !"));
+      return next(
+        new AuthError("Accès refusé : utilisateur ou vendeur introuvable.")
+      );
     }
 
     // user verification
     const user = await prisma.users.findUnique({ where: { id: decoded.id } });
     if (!user) {
-      return next(new ValidationError("user/seller not found !"));
+      return next(new ValidationError("Utilisateur introuvable."));
     }
 
     // genertae new access token for the user every 15min
@@ -164,12 +170,25 @@ export const refreshToken = async (
       { id: decoded.id, role: decoded.role },
       process.env.ACCESS_TOKEN_SECRET as string,
       {
-        expiresIn: "15min",
+        expiresIn: "15m",
       }
     );
     setCookie(res, "access_token", newAccessToken);
 
     return res.status(201).json({ success: true });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// logged in user function
+export const getUser = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user;
+    res.status(201).json({
+      success: true,
+      user,
+    });
   } catch (error) {
     return next(error);
   }
