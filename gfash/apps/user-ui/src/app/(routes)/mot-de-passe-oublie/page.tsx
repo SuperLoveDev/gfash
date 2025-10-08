@@ -175,7 +175,7 @@ const ForgotPassword = () => {
                   placeholder="gfash@gmail.com"
                   className="w-full border-gray-300 px-3 mt-2 h-[40px] font-medium outline-none rounded-sm"
                   {...register("email", {
-                    required: "Email is required",
+                    required: "Votre email est requis !",
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: "Address email invalide",

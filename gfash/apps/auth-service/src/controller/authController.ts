@@ -8,7 +8,7 @@ import {
   verifyForgotPasswordOtp,
   verifyOtp,
 } from "../utils/auth.helper";
-import { ValidationError } from "../../../../packages/error-handler";
+import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import prisma from "../../../../packages/libs/Prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -128,6 +128,48 @@ export const loginUser = async (
       message: "Login successfully",
       user: { id: user.id, email: user.email, name: user.name },
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// refesh token user  and generate a new access token when the current one expires
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return next(new ValidationError("Unauthorized! NO refresh token"));
+    }
+
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.REFESH_TOKEN_SECRET as string
+    ) as { id: string; role: string };
+    if (!decoded || !decoded.id || !decoded.role) {
+      return next(new AuthError("Unauthoried user/seller not found !"));
+    }
+
+    // user verification
+    const user = await prisma.users.findUnique({ where: { id: decoded.id } });
+    if (!user) {
+      return next(new ValidationError("user/seller not found !"));
+    }
+
+    // genertae new access token for the user every 15min
+    const newAccessToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.ACCESS_TOKEN_SECRET as string,
+      {
+        expiresIn: "15min",
+      }
+    );
+    setCookie(res, "access_token", newAccessToken);
+
+    return res.status(201).json({ success: true });
   } catch (error) {
     return next(error);
   }
