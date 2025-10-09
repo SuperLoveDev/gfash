@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Réinitialisation du mot de passe - Gfash Seller</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #fafafa;
+        color: #222222;
+      }
+      a {
+        color: #000;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 24px;
+      }
+      table td {
+        vertical-align: top;
+      }
+      /* layout */
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .email-header {
+        background-color: purple;
+        padding: 24px;
+        color: #ffffff;
+      }
+      .email-body {
+        padding: 24px;
+        background-color: #ffffff;
+      }
+      .email-footer {
+        background-color: #f6f6f6;
+        padding: 24px;
+      }
+      /* buttons */
+      .buttons {
+        display: inline-block;
+        background-color: #0070f3;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-body">
+        <p>Bonjour <%= name %>,</p>
+        <p>
+          Nous avons reçu une demande de réinitialisation du mot de passe pour
+          votre compte <strong>Gfash Seller</strong>.
+        </p>
+        <p>
+          Pour réinitialiser votre mot de passe vendeur, veuillez utiliser le
+          code ci-dessous :
+        </p>
+        <h2><%= otp %></h2>
+        <p>
+          Ce code est valide pendant <strong>5 minutes</strong>. Passé ce délai,
+          vous devrez en demander un nouveau.
+        </p>
+        <p>
+          Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer
+          cet email — votre mot de passe restera inchangé.
+        </p>
+        <p>
+          Cordialement,<br />
+          <strong>L’équipe Gfash</strong>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
