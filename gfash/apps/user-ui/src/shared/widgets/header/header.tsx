@@ -1,9 +1,13 @@
+"use client";
+
 import { HeartCrack, Search, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import HaederBottom from "./heeaderBottom";
+import useUser from "@/hooks/useUser";
 
 const Header = () => {
+  const { user, isLoading } = useUser();
   return (
     <>
       <div className="w-full bg-purple-950">
@@ -27,19 +31,33 @@ const Header = () => {
 
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
-              <Link
-                href={"/connexion"}
-                className="w-[50px] h-[50px] border-[2px] border-gray-400 rounded-full flex items-center justify-center"
-              >
-                <User color="white" />
-              </Link>
-
-              <Link href={"/connexion"} className="">
-                <span className="block font-medium text-gray-300">
-                  Bienvenue,
-                </span>
-                <span className="block font-bold text-gray-300">LogIn</span>
-              </Link>
+              {!isLoading && user ? (
+                <>
+                  <Link
+                    href={"/profile"}
+                    className="w-[50px] h-[50px] border-[2px] border-gray-400 rounded-full flex items-center justify-center"
+                  >
+                    <User color="white" />
+                  </Link>
+                  <Link href={"/connexion"} className="">
+                    <span className="block font-medium text-gray-300">
+                      Bienvenue,
+                    </span>
+                    <span className="block font-bold text-gray-300">
+                      {user?.name}
+                    </span>
+                  </Link>
+                </>
+              ) : (
+                <Link href={"/connexion"} className="">
+                  <span className="block font-medium text-gray-300">
+                    Bienvenue,
+                  </span>
+                  <span className="block font-bold text-gray-300">
+                    {isLoading ? "..." : "connexion"}
+                  </span>
+                </Link>
+              )}
             </div>
 
             <div className="flex items-center gap-5">
@@ -53,7 +71,7 @@ const Header = () => {
               <Link href={"/cart"} className="relative">
                 <ShoppingCart size={30} color="gray" />
                 <div className="absolute top-[-10px] right-[-10px] border rounded-full w-6 h-6 bg-red-500 flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">10</span>
+                  <span className="text-white font-medium text-sm">0</span>
                 </div>
               </Link>
             </div>

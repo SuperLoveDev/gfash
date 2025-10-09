@@ -1,5 +1,7 @@
 "use client";
 import { navItem } from "@/configs/constants";
+import useUser from "@/hooks/useUser";
+
 import {
   AlignLeft,
   ChevronDown,
@@ -13,6 +15,9 @@ import React, { useEffect, useState } from "react";
 const HaederBottom = () => {
   const [show, setShow] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const { user, isLoading } = useUser();
+
+  console.log(user);
 
   // track the scroll bar
   useEffect(() => {
@@ -76,35 +81,49 @@ const HaederBottom = () => {
 
         <div>
           {isSticky && (
-            <div className="hidden sm:flex items-center gap-8">
+            <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
-                <Link
-                  href={"/login"}
-                  className="w-[50px] h-[50px] border-[2px] border-gray-400 rounded-full flex items-center justify-center"
-                >
-                  <User />
-                </Link>
-
-                <Link href={"/login"} className="">
-                  <span className="block font-medium text-gray-900">
-                    Bienvenue,
-                  </span>
-                  <span className="block font-bold text-gray-900">LogIn</span>
-                </Link>
+                {!isLoading && user ? (
+                  <>
+                    <Link
+                      href={"/profile"}
+                      className="w-[50px] h-[50px] border-[2px] border-gray-400 rounded-full flex items-center justify-center"
+                    >
+                      <User color="white" />
+                    </Link>
+                    <Link href={"/connexion"} className="">
+                      <span className="block font-medium text-gray-300">
+                        Bienvenue,
+                      </span>
+                      <span className="block font-bold text-gray-300">
+                        {user?.name}
+                      </span>
+                    </Link>
+                  </>
+                ) : (
+                  <Link href={"/connexion"} className="">
+                    <span className="block font-medium text-gray-300">
+                      Bienvenue,
+                    </span>
+                    <span className="block font-bold text-gray-300">
+                      {isLoading ? "..." : "connexion"}
+                    </span>
+                  </Link>
+                )}
               </div>
 
               <div className="flex items-center gap-5">
                 <Link href={"/whislit"} className="relative">
-                  <HeartCrack size={30} />
-                  <div className="absolute top-[-10px] right-[-10px] rounded-full w-6 h-6 bg-red-500 flex items-center justify-center">
-                    <span className="text-white font-medium text-xs">0</span>
+                  <HeartCrack size={30} color="gray" />
+                  <div className="absolute top-[-10px] right-[-10px] border rounded-full w-6 h-6 bg-red-500 flex items-center justify-center">
+                    <span className="text-white font-medium text-sm">0</span>
                   </div>
                 </Link>
 
                 <Link href={"/cart"} className="relative">
-                  <ShoppingCart size={30} />
-                  <div className="absolute top-[-10px] right-[-10px] rounded-full w-6 h-6 bg-red-500 flex items-center justify-center">
-                    <span className="text-white font-medium text-xs">0</span>
+                  <ShoppingCart size={30} color="gray" />
+                  <div className="absolute top-[-10px] right-[-10px] border rounded-full w-6 h-6 bg-red-500 flex items-center justify-center">
+                    <span className="text-white font-medium text-sm">0</span>
                   </div>
                 </Link>
               </div>

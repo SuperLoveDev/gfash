@@ -43,7 +43,6 @@ axiosInstance.interceptors.response.use(
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_SERVER_UI}/auth/api/utilisateur-rafraichir-token`,
-          {},
           { withCredentials: true }
         );
         isRefreshing = false;
