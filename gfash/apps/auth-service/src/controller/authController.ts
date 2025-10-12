@@ -394,3 +394,20 @@ export const createBoutique = async (
     return next(error);
   }
 };
+
+// PAYSTACK CONNECTION
+export const createPaystackLink = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { sellerId } = req.body;
+  if (!sellerId) {
+    return next(new ValidationError("Seller ID is required"));
+  }
+
+  const boutique = await prisma.sellers.findUnique({ where: { id: sellerId } });
+  if (!boutique) {
+    return next(new ValidationError("Aucune boutique n'est associé a cet ID"));
+  }
+};

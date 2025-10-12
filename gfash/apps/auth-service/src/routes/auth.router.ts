@@ -24,7 +24,8 @@ router.get("/utilisateur-connecte", isAuthenticated, getUser);
 router.post("/mot-de-passe-utili-oublie", userForgotPassword);
 router.post("/verif-mdp-utili-oublie", verifyUserForgotPassword);
 router.post("/reset-user-password", resetUserPassword);
-router.post("/inscription-boutique", sellerRegistration);
+// seller routes
+router.post("/inscription-vendeur", sellerRegistration);
 router.post("/verification-vendeur", verifySeller);
 router.post("/creation-boutique", createBoutique);
 

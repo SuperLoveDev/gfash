@@ -1,5 +1,7 @@
 "use client";
 
+import PaymentLogo from "@/assets/svgs/payment-logo";
+import CreateBoutique from "@/shared/modules/auth/create-boutique";
 import countries from "@/utils/countries";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -18,19 +20,19 @@ type FormData = {
 };
 
 const Signup = () => {
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(3);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [canResend, setCanResend] = useState(true);
   const [timer, setTimer] = useState(60);
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const [userData, setUserData] = useState<FormData | null>(null);
+  const [sellerData, setSellerData] = useState<FormData | null>(null);
+  const [sellerId, setSellerId] = useState("");
   const [showOtp, setShowOtp] = useState(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const router = useRouter();
 
   const phone_numberRegex =
     /^(\+?[1-9][0-9]{0,3}[-.\s]?)?([0-9][-.\s]?){7,15}$/;
-
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const router = useRouter();
 
   const {
     register,
@@ -55,13 +57,13 @@ const Signup = () => {
   const signupMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/inscription-utilisateur`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/inscription-vendeur`,
         data
       );
       return response.data;
     },
     onSuccess: (_, formData) => {
-      setUserData(formData);
+      setSellerData(formData);
       setShowOtp(true);
       setCanResend(false);
       setTimer(60);
@@ -72,18 +74,19 @@ const Signup = () => {
   // otp verification and redirection to the login page
   const verifyOtpMutation = useMutation({
     mutationFn: async () => {
-      if (!userData) return;
+      if (!sellerData) return;
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/verification-utilisateur`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/verification-vendeur`,
         {
-          ...userData,
+          ...sellerData,
           otp: otp.join(""),
         }
       );
       return response.data;
     },
-    onSuccess: () => {
-      router.push("/connexion");
+    onSuccess: (data) => {
+      setSellerId(data?.seller?.id);
+      setActiveStep(2);
     },
   });
 
@@ -113,14 +116,31 @@ const Signup = () => {
     }
   };
 
+  // resend otp function when OTP expires
   const resendOtp = () => {
-    if (userData) {
-      signupMutation.mutate(userData);
+    if (sellerData) {
+      signupMutation.mutate(sellerData);
+    }
+  };
+
+  // paystack boutique or vendor function
+  const connectPaystack = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/creer-paystack-lien`,
+        { sellerId }
+      );
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-10 min-h-screen">
+    <div className="w-full flex flex-col items-center pt-10 min-h-screen bg-purple-50">
       {/* Stepper */}
       <div className="relative flex sm:flex-row items-center justify-between w-[90%] sm:w-[70%] md:w-[50%] mb-8 gap-6 sm:gap-0">
         {[1, 2, 3].map((step) => (
@@ -132,13 +152,13 @@ const Signup = () => {
               className={`w-10 h-10 sm:w-12 sm:h-12 text-sm sm:text-base flex items-center justify-center rounded-full font-semibold transition-all duration-300 ${
                 step <= activeStep
                   ? "bg-purple-900 text-white"
-                  : "bg-black text-gray-50"
+                  : "bg-white text-black"
               }`}
             >
               {step}
             </div>
 
-            <span className="mt-2 text-xs sm:text-sm text-gray-700 font-medium max-w-[90px]">
+            <span className="mt-2 text-xs sm:text-sm text-gray-700 font-bold max-w-[90px]">
               {step === 1
                 ? "Créer un compte"
                 : step === 2
@@ -150,11 +170,11 @@ const Signup = () => {
       </div>
 
       {/* steps content */}
-      <div className="w-[90%] md:w-[480px] p-8 mt-10 px-4 sm:px-8 shadow-2xl rounded-lg">
+      <div className="w-[90%] md:w-[480px] p-8 mt-5 px-4 sm:px-8 shadow-2xl rounded-lg bg-white">
         {activeStep === 1 && (
           <>
             {!showOtp ? (
-              <form onSubmit={handleSubmit(onSubmit)} className="mt-10">
+              <form onSubmit={handleSubmit(onSubmit)} className="mt-5">
                 <h3 className="text-center mb-8 font-medium text-2xl sm:text-4xl">
                   Creer Mon Compte
                 </h3>
@@ -165,7 +185,7 @@ const Signup = () => {
                 <input
                   type="text"
                   placeholder="John"
-                  className="w-full border border-purple-800 shadow px-3 mt-2 h-[40px] font-medium outline-none rounded-sm"
+                  className="w-full border border-gray-400 rounded-xl p-6 px-3 mt-2 h-[40px] font-medium outline-none"
                   {...register("name", {
                     required: "Votre nom est requis !",
                   })}
@@ -183,7 +203,7 @@ const Signup = () => {
                 <input
                   type="email"
                   placeholder="gfash@gmail.com"
-                  className="w-full border border-purple-800 shadow px-3 mt-2 h-[40px] font-medium outline-none rounded-sm"
+                  className="w-full border border-gray-400 p-6 px-3 mt-2 h-[40px] font-medium outline-none rounded-xl"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -205,7 +225,7 @@ const Signup = () => {
                 <input
                   type="teL"
                   placeholder="+0000000000"
-                  className="w-full border border-purple-800 shadow px-3 mt-2 h-[40px] font-medium outline-none rounded-sm"
+                  className="w-full border border-gray-400 rounded-xl p-6 px-3 mt-2 h-[40px] font-medium outline-none"
                   {...register("phone_number", {
                     required: "Votre numero telephone est requis",
                     pattern: {
@@ -236,7 +256,7 @@ const Signup = () => {
                   {...register("country", {
                     required: "Votre pays est requis!",
                   })}
-                  className="w-full border border-purple-800 shadow px-3 h-[40px] text-black font-medium outline-none"
+                  className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
                 >
                   <option value="">Sélectionnez votre pays</option>
                   {countries.map((country) => (
@@ -247,7 +267,7 @@ const Signup = () => {
                 </select>
                 {errors.country && (
                   <p className="text-red-500 text-sm">
-                    {errors.country.message}
+                    {String(errors.country.message)}
                   </p>
                 )}
 
@@ -259,7 +279,7 @@ const Signup = () => {
                   <input
                     type={passwordVisible ? "text" : "password"}
                     placeholder="votre de passe ici.."
-                    className="w-full border border-purple-800 shadow px-3 h-[40px] text-black font-medium outline-none"
+                    className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
                     {...register("password", {
                       required: "password is required",
                       minLength: {
@@ -289,7 +309,7 @@ const Signup = () => {
                 <button
                   type="submit"
                   disabled={signupMutation.isPending}
-                  className={`w-full bg-purple-900 mt-10 h-[40px] text-white font-medium text-base sm:text-lg cursor-pointer transition-all duration-300 hover:bg-purple-950 ${
+                  className={`w-full flex items-center justify-center bg-purple-900 mt-10 h-[40px] text-white font-medium text-base sm:text-lg cursor-pointer transition-all duration-300 hover:bg-purple-950 rounded-xl p-6 ${
                     signupMutation.isPending
                       ? "opacity-70 cursor-not-allowed"
                       : ""
@@ -374,6 +394,25 @@ const Signup = () => {
               </div>
             )}
           </>
+        )}
+
+        {activeStep === 2 && (
+          <CreateBoutique sellerId={sellerId} setActiveStep={setActiveStep} />
+        )}
+
+        {/* payment setup */}
+        {activeStep === 3 && (
+          <div className="text-center">
+            <h3 className="text-2xl font-semibold">Retrait Fond</h3>
+            <br />
+            <button
+              className="w-full flex justify-center items-center bg-purple-600 text-white h-[40px] p-8 text-sm sm:text-lg font-medium cursor-pointer"
+              onClick={connectPaystack}
+            >
+              Connceter Mon Compte Paiement
+              <PaymentLogo />
+            </button>
+          </div>
         )}
       </div>
     </div>

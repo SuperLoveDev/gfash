@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Réinitialisation du mot de passe - Gfash</title>
+    <title>Activation de votre compte - Gfash</title>
     <style type="text/css">
       body {
         margin: 0;
@@ -70,25 +70,22 @@
     <div class="email-wrapper">
       <div class="email-body">
         <p>Bonjour <%= name %>,</p>
+        <p>Bienvenue sur <strong>Gfash</strong> ! 🎉</p>
         <p>
-          Nous avons reçu une demande de réinitialisation du mot de passe pour
-          votre compte <strong>Gfash</strong>.
-        </p>
-        <p>
-          Pour réinitialiser votre mot de passe, veuillez utiliser le code
-          ci-dessous :
+          Pour activer votre compte utilisateur, veuillez saisir le code de
+          validation ci-dessous :
         </p>
         <h2><%= otp %></h2>
         <p>
-          Ce code est valide pendant <strong>5 minutes</strong>. Passé ce délai,
-          vous devrez en demander un nouveau.
+          Ce code est valable pendant <strong>5 minutes</strong>. Au-delà, il
+          faudra en demander un nouveau.
         </p>
         <p>
-          Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer
-          cet email — votre mot de passe restera inchangé.
+          Si vous n’avez pas créé de compte chez nous, vous pouvez ignorer cet
+          email.
         </p>
         <p>
-          Cordialement,<br />
+          À très vite,<br />
           <strong>L’équipe Gfash</strong>
         </p>
       </div>
