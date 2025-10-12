@@ -140,7 +140,11 @@ export const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken =
+      req.cookies["refresh_token"] ||
+      req.cookies["seller-refesh-token"] ||
+      req.headers.authorization?.split(" ")[1];
+
     if (!refreshToken) {
       return next(
         new ValidationError(
@@ -159,6 +163,20 @@ export const refreshToken = async (
       );
     }
 
+    let account;
+    if (decoded.role === "user") {
+      account = await prisma.users.findUnique({ where: { id: decoded.id } });
+    } else if (decoded.role === "seller") {
+      account = await prisma.sellers.findUnique({
+        where: { id: decoded.id },
+        include: { shop: true },
+      });
+    }
+
+    if (!account) {
+      return new AuthError("utilisateur/Vendeur non trouvé");
+    }
+
     // user verification
     const user = await prisma.users.findUnique({ where: { id: decoded.id } });
     if (!user) {
@@ -173,7 +191,11 @@ export const refreshToken = async (
         expiresIn: "15m",
       }
     );
-    setCookie(res, "access_token", newAccessToken);
+    if (decoded.role === "user") {
+      setCookie(res, "access_token", newAccessToken);
+    } else if (decoded.role === "seller") {
+      setCookie(res, "seller-access-token", newAccessToken);
+    }
 
     return res.status(201).json({ success: true });
   } catch (error) {
@@ -389,6 +411,76 @@ export const createBoutique = async (
     res.status(201).json({
       success: true,
       boutique,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// logged in user
+export const loginSeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return next(new ValidationError("L'email et mot de passe sont requis !"));
+    }
+
+    const seller = await prisma.sellers.findUnique({ where: { email } });
+    if (!seller) {
+      return next(new ValidationError("Un vendeur existe déja avec cet email"));
+    }
+
+    // hashed password
+    const isMatch = await bcrypt.compare(password, seller.password!);
+    if (!isMatch) {
+      return next(new ValidationError("Email / mot de passe invalide"));
+    }
+
+    // generate access and refresh token
+    const accessToken = jwt.sign(
+      { id: seller.id, role: "seller" },
+      process.env.ACCESS_TOKEN_SECRET as string,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: seller.id, role: "seller" },
+      process.env.REFRESH_TOKEN_SECRET as string,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    //store both access and refresh token
+    setCookie(res, "seller-access-token", accessToken);
+    setCookie(res, "seller-refresh-token", refreshToken);
+
+    res.status(200).json({
+      message: "Login succesfull",
+      seller: { id: seller.id, email: seller.email, name: seller.name },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// get logged in seller
+export const getSeller = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { seller } = req.seller;
+    res.status(201).json({
+      success: true,
+      seller,
     });
   } catch (error) {
     return next(error);

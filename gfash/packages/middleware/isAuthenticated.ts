@@ -6,7 +6,9 @@ import prisma from "../libs/Prisma";
 const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
   try {
     const token =
-      req.cookies.access_token || req.headers.authorization?.split(" ")[1];
+      req.cookies["access_token"] ||
+      req.cookies["seller-access-token"] ||
+      req.headers.authorization?.split(" ")[1];
     if (!token) {
       return next(new ValidationError("Accès non autorisé : token manquant."));
     }
@@ -22,13 +24,25 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
       });
     }
 
-    const account = await prisma.users.findUnique({
-      where: { id: decoded.id },
-    });
-    req.user = account;
+    let account;
+    if (decoded.role === "user") {
+      account = await prisma.users.findUnique({
+        where: { id: decoded.id },
+      });
+      req.user = account;
+    } else if (decoded.role === "seller") {
+      account = await prisma.sellers.findUnique({
+        where: { id: decoded.id },
+        include: { shop: true },
+      });
+      req.seller = account;
+    }
+
     if (!account) {
       return res.status(401).json({ message: "Compte introuvable!" });
     }
+
+    req.role = decoded.role;
 
     return next();
   } catch (error) {
