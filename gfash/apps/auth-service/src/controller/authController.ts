@@ -105,6 +105,9 @@ export const loginUser = async (
       return next(new ValidationError("Email ou Mot de passe invalide"));
     }
 
+    res.clearCookie("seller-acces-token");
+    res.clearCookie("seller-refresh-token");
+
     // generate access and refresh token
     const accessToken = jwt.sign(
       { id: user.id, role: "user" },
@@ -135,7 +138,7 @@ export const loginUser = async (
 
 // refesh token user  and generate a new access token when the current one expires
 export const refreshToken = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
@@ -196,6 +199,8 @@ export const refreshToken = async (
     } else if (decoded.role === "seller") {
       setCookie(res, "seller-access-token", newAccessToken);
     }
+
+    req.role = decoded.role;
 
     return res.status(201).json({ success: true });
   } catch (error) {
@@ -439,6 +444,9 @@ export const loginSeller = async (
     if (!isMatch) {
       return next(new ValidationError("Email / mot de passe invalide"));
     }
+
+    res.clearCookie("acces-token");
+    res.clearCookie("refresh-token");
 
     // generate access and refresh token
     const accessToken = jwt.sign(
