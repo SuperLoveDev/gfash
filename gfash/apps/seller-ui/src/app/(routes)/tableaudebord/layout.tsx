@@ -3,13 +3,13 @@ import React from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex h-full bg-black min-h-screen">
+    <div className="flex h-full min-h-screen bg-black text-white">
       {/* sidebar */}
-      <div className="w-[280px] min-w-[250px] max-w-[300px] border-r border-r-slate-300 ">
-        <div className="sticky top-0">
+      <aside className="w-[140px] sm:w-[270px] border-r border-r-white">
+        <div className="sticky top-0 text-xs sm:text-base p-2 sm:p-4">
           <SidebarWrapper />
         </div>
-      </div>
+      </aside>
 
       {/* main content */}
       <main className="flex-1">

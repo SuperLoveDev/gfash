@@ -12,12 +12,14 @@ const SidebarItems = ({ title, icons, isActive, href }: Props) => {
   return (
     <Link href={href} className="my-2 block">
       <div
-        className={`flex gap-2 w-full min-h-12 h-full items-center px-[13px] rounded-lg cursor-pointer transition hover:bg-gray-800 ${
+        className={`flex gap-2 w-30 sm:w-full min-h-12 h-full items-center px-[13px] rounded-lg cursor-pointer transition hover:bg-gray-800 ${
           isActive && "scale-[.98] bg-gray-800 fill-blue-200 hover:bg-gray-600"
         }`}
       >
-        {icons}
-        <h5 className="text-slate-200 text-base sm:text-lg">{title}</h5>
+        <span>{icons}</span>
+        <h5 className="hidden sm:block text-slate-200 text-sm sm:text-lg">
+          {title}
+        </h5>
       </div>
     </Link>
   );

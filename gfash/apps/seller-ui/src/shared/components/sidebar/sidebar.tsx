@@ -13,9 +13,9 @@ import {
   BellRing,
   CalendarPlus,
   HandCoins,
+  Home,
   ListOrdered,
   LogOut,
-  LucideLayoutDashboard,
   Mail,
   PackageIcon,
   Settings,
@@ -74,7 +74,7 @@ const SidebarWrapper = () => {
             href="/tableaudebord"
             title="Tableau de Bord"
             icons={
-              <LucideLayoutDashboard
+              <Home
                 className={
                   activeSidebar === "/tableaudebord"
                     ? "text-purple-500"
@@ -87,7 +87,7 @@ const SidebarWrapper = () => {
 
           {/* MAIN MENU */}
           <div className="mt-2 block">
-            <SidebarMenu title="Menu Principal">
+            <SidebarMenu title="MENU PRINCIPAL">
               <SidebarItems
                 href="/tableaudebord/commandes"
                 title="List Commandes"
@@ -122,7 +122,7 @@ const SidebarWrapper = () => {
             </SidebarMenu>
 
             {/* PRODUCTS */}
-            <SidebarMenu title="Produits">
+            <SidebarMenu title="PRODUITS">
               <SidebarItems
                 href="/tableaudebord/creer-produit"
                 title="Creer un Produit"
@@ -157,10 +157,10 @@ const SidebarWrapper = () => {
             </SidebarMenu>
 
             {/* EVENT */}
-            <SidebarMenu title="Evenements">
+            <SidebarMenu title="EVENEMENTS">
               <SidebarItems
                 href="/tableaudebord/creer-evenement"
-                title="Mes Evenements"
+                title="Creer Evenements"
                 icons={
                   <CalendarPlus
                     size={26}
@@ -192,7 +192,7 @@ const SidebarWrapper = () => {
             </SidebarMenu>
 
             {/* CONTROLLERS / MANAGEMENT */}
-            <SidebarMenu title="Gestion">
+            <SidebarMenu title="GESTION">
               <SidebarItems
                 href="/tableaudebord/boite-reception"
                 title="Boite de Réception"
@@ -243,7 +243,7 @@ const SidebarWrapper = () => {
             </SidebarMenu>
 
             {/* EXTRAS */}
-            <SidebarMenu title="Extras">
+            <SidebarMenu title="EXTRAS">
               <SidebarItems
                 href="/tableaudebord/code-promo"
                 title="Code Promo"
@@ -261,19 +261,19 @@ const SidebarWrapper = () => {
               />
 
               <SidebarItems
-                href="/deconnexion"
+                href="/tableaudebord/deconnexion"
                 title="Deconnexion"
                 icons={
                   <LogOut
                     size={26}
                     className={
-                      activeSidebar === "/deconnexion"
+                      activeSidebar === "/tableaudebord/deconnexion"
                         ? "text-purple-500"
                         : "text-white"
                     }
                   />
                 }
-                isActive={activeSidebar === "/deconnexion"}
+                isActive={activeSidebar === "/tableaudebord/deconnexion"}
               />
             </SidebarMenu>
           </div>
