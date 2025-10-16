@@ -31,7 +31,7 @@
     "prisma": "^6.16.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-hook-form": "^7.64.0",
+    "react-hook-form": "^7.65.0",
     "react-hot-toast": "^2.6.0",
     "styled-components": "^6.1.19",
     "swagger-autogen": "^2.23.7",

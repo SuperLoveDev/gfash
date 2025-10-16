@@ -5,8 +5,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-full min-h-screen bg-black text-white">
       {/* sidebar */}
-      <aside className="w-[140px] sm:w-[270px] border-r border-r-white">
-        <div className="sticky top-0 text-xs sm:text-base p-2 sm:p-4">
+      <aside className="w-[130px] sm:w-[270px] border-r border-r-white">
+        <div className="sticky top-0 text-xs sm:text-base p-1 sm:p-4">
           <SidebarWrapper />
         </div>
       </aside>
