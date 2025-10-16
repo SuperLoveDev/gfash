@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import axios from "axios";
 import swaggerUi from "swagger-ui-express";
 import * as path from "path";
+import initializeSiteConfig from "./libs/initializeSiteConfig";
 
 const app = express();
 
@@ -46,5 +47,11 @@ app.use("/", proxy("http://localhost:2025"));
 const port = process.env.PORT || 9090;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
+  try {
+    initializeSiteConfig();
+    console.log("Configuration du site initialisé avec succèss !");
+  } catch (error) {
+    console.error("Configirutaion du site echoué:", error);
+  }
 });
 server.on("error", console.error);

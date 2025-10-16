@@ -104,7 +104,7 @@ const Page = () => {
 
         {/* right side - product input */}
         <div className="md:w-[65%]">
-          <div className="w-full flex gap-5">
+          <div className="w-full flex flex-col sm:flex-row gap-5">
             {/* product information */}
             <div className="w-full sm:w-2/4 font-Poppins">
               <Input
@@ -222,9 +222,12 @@ const Page = () => {
                   </p>
                 )}
               </div>
+            </div>
 
-              {/* color-selector */}
-              <div className="mt-2 sm:mt-3"></div>
+            <div className="w-full sm:w-2/4 font-Poppins">
+              <label className="block font-semibold text-gray-300">
+                category *
+              </label>
             </div>
           </div>
         </div>
