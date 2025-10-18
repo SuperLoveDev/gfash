@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../../../packages/libs/Prisma";
+import { ValidationError } from "../../../../packages/error-handler";
 
 // get product categories
 export const getCategories = async (
@@ -17,6 +18,102 @@ export const getCategories = async (
     res.status(200).json({
       categories: config.categories,
       subCategories: config.subCategories,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// create a discount promo code
+export const createPromoCode = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { public_name, discountType, discountValue, discountCode } = req.body;
+    if (!public_name || !discountType || !discountValue || !discountCode) {
+      return next(new ValidationError("Tous les champs sont requis"));
+    }
+
+    // verifying if the promo code does exist
+    const existingPromoCode = await prisma.code_promo.findUnique({
+      where: { discountCode },
+    });
+    if (existingPromoCode) {
+      return next(
+        new ValidationError(
+          "Ce code promo existe déjà. Veuillez en utiliser un autre."
+        )
+      );
+    }
+
+    // create a discount code or promo-code
+    const createDiscountCode = await prisma.code_promo.create({
+      data: {
+        public_name,
+        discountType,
+        discountValue: parseFloat(discountValue),
+        discountCode,
+        sellerId: req.seller.id,
+      },
+    });
+    return res.status(201).json({
+      success: true,
+      message: "Code promo crée avec succèss",
+      createDiscountCode,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// get discount promo code
+export const getPromoCode = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const promoCode = await prisma.code_promo.findMany({
+      where: { sellerId: req.seller.id },
+    });
+
+    res.status(200).json({
+      success: true,
+      promoCode,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// delete a discount promo code
+export const deletePromoCode = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const sellerId = req.seller?.id;
+
+    // first check if the promo code exist
+    const existingPromoCode = await prisma.code_promo.findUnique({
+      where: { id },
+      select: { id: true, sellerId: true },
+    });
+    if (!existingPromoCode) {
+      return next(new ValidationError("Code promo introuvable"));
+    }
+    if (existingPromoCode.sellerId !== sellerId) {
+      return next(new ValidationError("Access no autorisé"));
+    }
+
+    await prisma.code_promo.delete({ where: { id } });
+
+    res.status(200).json({
+      message: "Code promo supprimer avec succèss",
     });
   } catch (error) {
     return next(error);
