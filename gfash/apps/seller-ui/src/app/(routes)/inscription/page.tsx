@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -29,7 +29,6 @@ const Signup = () => {
   const [sellerId, setSellerId] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const router = useRouter();
 
   const phone_numberRegex =
     /^(\+?[1-9][0-9]{0,3}[-.\s]?)?([0-9][-.\s]?){7,15}$/;

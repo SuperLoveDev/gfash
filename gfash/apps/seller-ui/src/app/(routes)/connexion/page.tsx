@@ -13,7 +13,7 @@ type FormData = {
   password: string;
 };
 
-const Login = () => {
+const Connexion = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
@@ -62,7 +62,7 @@ const Login = () => {
       <div className="w-full pt-5 flex justify-center">
         <div className="md:w-[480px] p-8 bg-gray-100 shadow rounded-lg  border-gray-100">
           <h3 className="text-sm sm:text-base text-center text-gray-800 font-semibold">
-            Bienvenue chez GFASH ! Connectez-vous pour découvrir nos offres
+            Se connecter a mon compte GFASH
           </h3>
           <div className="flex items-center mt-3 justify-center gap-2">
             <p className="text-gray-500">Vous n'avez pas de compte ?</p>
@@ -171,4 +171,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Connexion;

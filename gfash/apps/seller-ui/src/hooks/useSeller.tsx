@@ -4,7 +4,7 @@ import axiosInstance from "@/utils/axiosinstance";
 // Fetch seller data from API using Axios instance
 const fetchSeller = async () => {
   const response = await axiosInstance.get("/api/vendeur-connecte");
-  return response.data.user;
+  return response.data.seller;
 };
 
 const useSeller = () => {

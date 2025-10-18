@@ -485,8 +485,16 @@ export const getSeller = async (
   next: NextFunction
 ) => {
   try {
-    const { seller } = req.seller;
-    res.status(201).json({
+    const seller = req.seller;
+
+    if (!seller) {
+      return res.status(401).json({
+        success: false,
+        message: "Vendeur non authentifié",
+      });
+    }
+
+    res.status(200).json({
       success: true,
       seller,
     });

@@ -1,3 +1,4 @@
+"use client";
 import SidebarWrapper from "@/shared/components/sidebar/sidebar";
 import React from "react";
 
