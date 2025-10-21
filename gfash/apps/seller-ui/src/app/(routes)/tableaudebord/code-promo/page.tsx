@@ -8,9 +8,13 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Input from "../../../../../../../packages/input";
+import DeletePromoCodeModal from "@/shared/components/modals/delete.promocode";
 
 const Page = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPromo, setSelectedPromo] = useState<any>();
+
   const queryClient = useQueryClient();
 
   const { data: promoCode = [], isLoading } = useQuery({
@@ -57,8 +61,21 @@ const Page = () => {
     },
   });
 
+  const DeletePromoCodeMutation = useMutation({
+    mutationFn: async (promoId) => {
+      await axiosInstance.post(`produit/api/supprimer-code-promo/${promoId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["boutique-promo"] });
+      setShowDeleteModal(false);
+    },
+  });
+
   // delete a promo code
-  const handleDeleteClick = async (promo: string) => {};
+  const handleDeleteClick = async (promo: any) => {
+    setSelectedPromo(promo);
+    setShowDeleteModal(true);
+  };
 
   return (
     <div className="w-full p-8 rounded-lg font-Poppins">
@@ -273,6 +290,14 @@ const Page = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {showDeleteModal && selectedPromo && (
+        <DeletePromoCodeModal
+          promo={selectedPromo}
+          onClose={() => setShowDeleteModal(true)}
+          onConfirm={() => DeletePromoCodeMutation.mutate(selectedPromo?.id)}
+        />
       )}
     </div>
   );

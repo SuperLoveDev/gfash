@@ -40,11 +40,19 @@ const Page = () => {
     retry: 2,
   });
 
+  // fetching available promo code from our promocode page
+  const { data: promoCode = [], isLoading: promoLoading } = useQuery({
+    queryKey: ["boutique-promo"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/produit/api/code-promo");
+      return response?.data?.code_promo || [];
+    },
+  });
+
   const categories = data?.categories || [];
   const subCategoriesData = data?.subCategories || {};
 
   const selectedCategory = watch("category");
-  const regularPrice = watch("regular_price");
 
   const subCategories = useMemo(() => {
     return selectedCategory ? subCategoriesData[selectedCategory] || [] : [];
@@ -493,6 +501,46 @@ const Page = () => {
               </div>
 
               {/* Discount code */}
+              <div className="mt-3 font-Poppins">
+                <label className="block font-semibold text-gray-200">
+                  Sélectionnez un code promo (optionnel)
+                </label>
+
+                {promoLoading ? (
+                  <p className="text-gray-300">Chargement des codes promo...</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {promoCode?.map((code: any) => {
+                      const selectedCodes = watch("promoCodes") || [];
+                      const isSelected = selectedCodes.includes(code.id);
+
+                      return (
+                        <button
+                          key={code.id}
+                          type="button"
+                          className={`px-3 py-1 rounded-md text-sm font-semibold border transition ${
+                            isSelected
+                              ? "bg-purple-600 border-purple-500 text-white"
+                              : "bg-gray-900 border-gray-700 text-gray-200 hover:bg-gray-800"
+                          }`}
+                          onClick={() => {
+                            const updatedSelection = isSelected
+                              ? selectedCodes.filter(
+                                  (id: string) => id !== code.id
+                                )
+                              : [...selectedCodes, code.id];
+
+                            setValue("promoCodes", updatedSelection);
+                          }}
+                        >
+                          {code.public_name} ({code.discountValue}
+                          {code.discountType === "percentage" ? "%" : " FCFA"})
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
