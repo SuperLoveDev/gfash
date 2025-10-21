@@ -75,13 +75,14 @@ export const getPromoCode = async (
   next: NextFunction
 ) => {
   try {
-    const promoCode = await prisma.code_promo.findMany({
+    console.log(req.seller);
+    const code_promo = await prisma.code_promo.findMany({
       where: { sellerId: req.seller.id },
     });
 
     res.status(200).json({
       success: true,
-      promoCode,
+      code_promo,
     });
   } catch (error) {
     return next(error);

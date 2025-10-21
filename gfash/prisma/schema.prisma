@@ -50,7 +50,7 @@ model shops {
   avatar images? 
   coverBanner String?
   address String
-  shop_contact String
+  // shop_contact String
   opening_hours String?
   website String?
   socialLinks Json[]

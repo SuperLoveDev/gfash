@@ -24,7 +24,7 @@ const CreateBoutique = ({
   };
 
   const createBoutiqueMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: any) => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/creation-boutique`,
         data

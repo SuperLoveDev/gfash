@@ -1,4 +1,4 @@
-const countries = [
+export const countries = [
   { code: "ZAF", name: "Afrique du Sud" },
   { code: "DZA", name: "Algérie" },
   { code: "AGO", name: "Angola" },
@@ -54,5 +54,3 @@ const countries = [
   { code: "ZMB", name: "Zambie" },
   { code: "ZWE", name: "Zimbabwe" },
 ];
-
-export default countries;

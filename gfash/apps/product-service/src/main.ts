@@ -20,8 +20,8 @@ app.get("/api", (req, res) => {
   res.send({ message: "Welcome to product-service!" });
 });
 
-app.use(errorMiddleware);
 app.use("/api", router);
+app.use(errorMiddleware);
 
 const port = process.env.PORT || 2026;
 const server = app.listen(port, () => {

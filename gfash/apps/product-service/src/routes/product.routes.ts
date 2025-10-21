@@ -11,7 +11,7 @@ const router: Router = express.Router();
 
 router.get("/categories", getCategories);
 router.post("/creer-code-promo", isAuthenticated, createPromoCode);
-router.get("/codes-promo", isAuthenticated, getPromoCode);
+router.get("/code-promo", isAuthenticated, getPromoCode);
 router.delete("/supprimer-code-promo/:id", isAuthenticated, deletePromoCode);
 
 export default router;

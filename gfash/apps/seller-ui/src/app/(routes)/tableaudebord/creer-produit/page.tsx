@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/utils/axiosinstance";
 import RichTextEditor from "../../../../../../../packages/RichTextEditor";
 import SizeSelector from "../../../../../../../packages/size-selector";
+import Link from "next/link";
 
 const Page = () => {
   const {
@@ -29,7 +30,7 @@ const Page = () => {
     queryKey: ["categories"],
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get("/product/api/categories");
+        const res = await axiosInstance.get("/produit/api/categories");
         return res.data;
       } catch (error) {
         console.error(error);
@@ -98,9 +99,12 @@ const Page = () => {
         Creer un produit
       </h1>
       <div className="w-full flex items-center my-2">
-        <span className="text-purple-500 text-base font-Poppins">
+        <Link
+          href={"/tableaudebord"}
+          className="text-purple-500 text-base font-Poppins"
+        >
           Tableau de bord
-        </span>
+        </Link>
         <ChevronRight size={16} />
         <span className="font-Poppins text-base">Produit</span>
       </div>

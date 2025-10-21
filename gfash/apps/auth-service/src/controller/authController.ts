@@ -310,7 +310,7 @@ export const sellerRegistration = async (
     await checkOtpRestrictions(email, next);
     await trackOtpRequests(email, next);
     // then send otp to the seller
-    await sendOtp(name, email, "seller-email-activation");
+    await sendOtp(name, email, "seller-activation-mail");
 
     res.status(200).json({
       success: true,
@@ -321,7 +321,7 @@ export const sellerRegistration = async (
   }
 };
 
-// verify seller
+// verify seller with otp
 export const verifySeller = async (
   req: Request,
   res: Response,
@@ -350,7 +350,7 @@ export const verifySeller = async (
 
     res.status(200).json({
       seller,
-      message: "Boutique créé avec success !",
+      message: "Vendeur enregistré créé avec success !",
     });
   } catch (error) {
     return next(error);
@@ -364,34 +364,11 @@ export const createBoutique = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      name,
-      bio,
-      category,
-      address,
-      shop_contact,
-      opening_hours,
-      website,
-      sellerId,
-    } = req.body;
+    const { name, bio, category, address, opening_hours, website, sellerId } =
+      req.body;
 
-    if (
-      !name ||
-      !bio ||
-      !category ||
-      !address ||
-      !shop_contact ||
-      !opening_hours ||
-      !sellerId
-    ) {
+    if (!name || !bio || !category || !address || !opening_hours || !sellerId) {
       return next(new ValidationError("Tous les champs sont requis !"));
-    }
-
-    const existingSeller = await prisma.sellers.findUnique({
-      where: { id: sellerId },
-    });
-    if (!existingSeller) {
-      return next(new ValidationError("vendeur introuvable"));
     }
 
     const shopData: any = {
@@ -399,7 +376,6 @@ export const createBoutique = async (
       bio,
       category,
       address,
-      shop_contact,
       opening_hours,
       sellerId,
     };
@@ -430,17 +406,24 @@ export const loginSeller = async (
 ) => {
   try {
     const { email, password } = req.body;
+    console.log("Tentative de connexion:", email);
+
     if (!email || !password) {
+      console.log("Erreur: Email ou mot de passe manquant");
       return next(new ValidationError("L'email et mot de passe sont requis !"));
     }
 
     const seller = await prisma.sellers.findUnique({ where: { email } });
+    console.log("Résultat findUnique:", seller);
+
     if (!seller) {
-      return next(new ValidationError("Un vendeur existe déja avec cet email"));
+      console.log("Erreur: Aucun vendeur trouvé avec cet email");
+      return next(new ValidationError("Email / mot de passe invalide"));
     }
 
-    // hashed password
     const isMatch = await bcrypt.compare(password, seller.password!);
+    console.log("Résultat bcrypt.compare:", isMatch);
+
     if (!isMatch) {
       return next(new ValidationError("Email / mot de passe invalide"));
     }
@@ -466,11 +449,11 @@ export const loginSeller = async (
     );
 
     //store both access and refresh token
-    setCookie(res, "seller-access-token", accessToken);
     setCookie(res, "seller-refresh-token", refreshToken);
+    setCookie(res, "seller-access-token", accessToken);
 
     res.status(200).json({
-      message: "Login succesfull",
+      message: "Connexion reussie !",
       seller: { id: seller.id, email: seller.email, name: seller.name },
     });
   } catch (error) {
@@ -487,14 +470,7 @@ export const getSeller = async (
   try {
     const seller = req.seller;
 
-    if (!seller) {
-      return res.status(401).json({
-        success: false,
-        message: "Vendeur non authentifié",
-      });
-    }
-
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       seller,
     });

@@ -13,7 +13,7 @@ type FormData = {
   password: string;
 };
 
-const Connexion = () => {
+const Page = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
@@ -28,7 +28,7 @@ const Connexion = () => {
   const loginMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/connexion-utilisateur`,
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/connexion-vendeur`,
         data,
         { withCredentials: true } // withCredentials: true, ensures cookies are sent and received,allowing session persistence across requests.
       );
@@ -51,7 +51,7 @@ const Connexion = () => {
   };
 
   return (
-    <div className="w-full py-20 min-h-[100vh] bg-white bg-gradient-to-br from-[#c6d6f9] via-[#e9d2ff] to-[#ffe0d0] relative overflow-hidden">
+    <div className="w-full py-10 min-h-screen bg-white bg-gradient-to-br from-[#c6d6f9] via-[#e9d2ff] to-[#ffe0d0] relative overflow-hidden">
       <h1 className="text-3xl sm:text-4xl font-semibold text-gray-800 text-center ">
         Se connecter
       </h1>
@@ -91,7 +91,7 @@ const Connexion = () => {
               placeholder="gfash@gmail.com"
               className="w-full border-gray-300 px-3 mt-2 h-[40px] font-medium outline-none rounded-sm"
               {...register("email", {
-                required: "Email is required",
+                required: "L'email est requis",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Address email invalide",
@@ -113,10 +113,11 @@ const Connexion = () => {
                 placeholder="votre de passe ici.."
                 className="w-full px-3 h-[40px] font-medium"
                 {...register("password", {
-                  required: "password is required",
+                  required: "Le mot de passe est requis",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message:
+                      "Le mot de passe doit contenir au moins 6 caractères",
                   },
                 })}
               />
@@ -171,4 +172,4 @@ const Connexion = () => {
   );
 };
 
-export default Connexion;
+export default Page;

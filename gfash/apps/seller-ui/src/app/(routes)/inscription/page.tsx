@@ -2,24 +2,24 @@
 
 import PaymentLogo from "@/assets/svgs/payment-logo";
 import CreateBoutique from "@/shared/modules/auth/create-boutique";
-import countries from "@/utils/countries";
+import { countries } from "@/utils/countries";
+
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-type FormData = {
-  name: string;
-  email: string;
-  phone_number: string;
-  country: string;
-  password: string;
-};
+// type FormData = {
+//   name: string;
+//   email: string;
+//   phone_number: string;
+//   country: string;
+//   password: string;
+// };
 
-const Signup = () => {
+const Page = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [canResend, setCanResend] = useState(true);
@@ -37,7 +37,7 @@ const Signup = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm();
 
   const startResendOtp = () => {
     const interval = setInterval(() => {
@@ -90,7 +90,7 @@ const Signup = () => {
   });
 
   // form handler
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: any) => {
     signupMutation.mutate(data);
   };
 
@@ -139,7 +139,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-10 min-h-screen bg-purple-50">
+    <div className="w-full flex flex-col items-center pt-10 min-h-screen bg-slate-900">
       {/* Stepper */}
       <div className="relative flex sm:flex-row items-center justify-between w-[90%] sm:w-[70%] md:w-[50%] mb-8 gap-6 sm:gap-0">
         {[1, 2, 3].map((step) => (
@@ -204,7 +204,7 @@ const Signup = () => {
                   placeholder="gfash@gmail.com"
                   className="w-full border border-gray-400 p-6 px-3 mt-2 h-[40px] font-medium outline-none rounded-xl"
                   {...register("email", {
-                    required: "Email is required",
+                    required: "L'Email est requis",
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: "Address email invalide",
@@ -248,19 +248,19 @@ const Signup = () => {
                 )}
 
                 {/* country input */}
-                <label className="block text-xl mt-2 sm:text-base text-gray-700">
+                <label className="block text-xl mb-1 sm:text-base text-gray-700">
                   Pays
                 </label>
                 <select
+                  className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
                   {...register("country", {
                     required: "Votre pays est requis!",
                   })}
-                  className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
                 >
                   <option value="">Sélectionnez votre pays</option>
-                  {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
+                  {countries.map((nation) => (
+                    <option key={nation.code} value={nation.code}>
+                      {nation.name}
                     </option>
                   ))}
                 </select>
@@ -418,4 +418,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Page;
