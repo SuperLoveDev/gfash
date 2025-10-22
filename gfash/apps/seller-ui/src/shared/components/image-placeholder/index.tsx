@@ -1,5 +1,5 @@
 "use client";
-import { Pencil, WandSparkles, X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -10,7 +10,6 @@ const ImagePlaceholder = ({
   onRemove,
   defaultImage = null,
   index = null,
-  setOpenImageModal,
 }: {
   size: string;
   small?: boolean;
@@ -18,7 +17,6 @@ const ImagePlaceholder = ({
   onRemove: (index: number) => void;
   defaultImage?: string | null;
   index?: any;
-  setOpenImageModal: (openImageModal: boolean) => void;
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(defaultImage);
 
@@ -53,13 +51,6 @@ const ImagePlaceholder = ({
             className="absolute top-3 right-3 p-2 !rounded bg-red-600 shadow-lg cursor-pointer"
           >
             <X size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => setOpenImageModal(true)}
-            className="absolute top-3 right-[70px] p-2 !rounded bg-purple-700 shadow-lg cursor-pointer"
-          >
-            <WandSparkles size={16} />
           </button>
         </>
       ) : (

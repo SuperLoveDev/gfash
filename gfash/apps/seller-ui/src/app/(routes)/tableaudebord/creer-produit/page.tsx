@@ -20,7 +20,6 @@ const Page = () => {
     formState: { errors },
   } = useForm();
 
-  const [openImageModal, setOpenImageModal] = useState(false);
   const [isChanged, setIsChanged] = useState(true);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [loading, setLoading] = useState(false);
@@ -54,40 +53,76 @@ const Page = () => {
 
   const selectedCategory = watch("category");
 
+  // categories selection
   const subCategories = useMemo(() => {
     return selectedCategory ? subCategoriesData[selectedCategory] || [] : [];
   }, [selectedCategory, subCategoriesData]);
 
-  console.log(categories, subCategories);
-
-  const handleImageChange = (file: File | null, index: number) => {
-    const updatedImages = [...images];
-    updatedImages[index] = file;
-
-    if (index === images.length - 1 && images.length < 8) {
-      updatedImages.push(null);
-    }
-    setImages(updatedImages);
-    setValue("images", images);
+  // function to covert file
+  const convertFileToBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
-  // function remove an image and add blanck input if needed
-  const handleRemoveImage = (index: number) => {
-    setImages((prevImages) => {
-      let updatedImages = [...prevImages];
+  const handleImageChange = async (file: File | null, index: number) => {
+    if (!file) return;
 
-      if (index === -1) {
-        updatedImages[index] = null;
-      } else {
-        updatedImages.splice(index, 1);
+    try {
+      const fileName = await convertFileToBase64(file);
+      const response = await axiosInstance.post(
+        "/produit/api/televerser-image-produit",
+        { fileName }
+      );
+      const updatedImages = [...images];
+      updatedImages[index] = response.data.file_url;
+
+      if (index === images.length - 1 && images.length < 8) {
+        updatedImages.push(null);
+      }
+      setImages(updatedImages);
+      setValue("images", updatedImages);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // function remove or delete an image and add blanck input if needed
+  const handleRemoveImage = async (index: number) => {
+    try {
+      const updatedImages = [...images];
+      const imageToDelete = updatedImages[index];
+
+      if (
+        imageToDelete &&
+        typeof imageToDelete === "object" &&
+        "fileId" in imageToDelete
+      ) {
+        await axiosInstance.delete("/produit/api/supprimer-image-produit", {
+          data: { fileId: imageToDelete.fileId },
+        });
       }
 
+      if (typeof imageToDelete === "string") {
+        await axiosInstance.delete("/produit/api/supprimer-image-produit", {
+          data: { fileUrl: imageToDelete },
+        });
+      }
+      updatedImages.splice(index, 1);
+
+      // add an image placeholder or slot
       if (!updatedImages.includes(null) && updatedImages.length < 8) {
         updatedImages.push(null);
       }
-      return updatedImages;
-    });
-    setValue("images", images);
+
+      setImages(updatedImages);
+      setValue("images", updatedImages);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Handle product creattion for form submisssion
@@ -123,7 +158,6 @@ const Page = () => {
         <div className="w-full lg:w-[35%]">
           {images?.length > 0 && (
             <ImagePlaceholder
-              setOpenImageModal={setOpenImageModal}
               size="765 x 850"
               small={false}
               index={0}
@@ -136,7 +170,6 @@ const Page = () => {
             {images.slice(1).map((_, index) => (
               <ImagePlaceholder
                 key={index}
-                setOpenImageModal={setOpenImageModal}
                 size="765 x 850"
                 small
                 index={index + 1}
