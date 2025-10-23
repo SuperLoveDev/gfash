@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../../../packages/libs/Prisma";
-import { ValidationError } from "../../../../packages/error-handler";
+import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import { imagekit } from "../../../../packages/libs/imageKit";
 
 // get product categories
@@ -160,6 +160,133 @@ export const deleteProductImage = async (
     res.status(200).json({
       success: true,
       response,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// create product
+export const createProduct = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title,
+      short_description,
+      detailed_description,
+      tag,
+      warranty,
+      slug,
+      brand,
+      category,
+      subCategory,
+      video_url,
+      sizes = [],
+      promoCodes = [],
+      stock,
+      sale_price,
+      regular_price,
+      images = [],
+    } = req.body;
+
+    const requiredFields = [
+      "title",
+      "short_description",
+      "detailed_description",
+      "slug",
+      "brand",
+      "category",
+      "subCategory",
+      "stock",
+      "regular_price",
+      "images",
+    ];
+
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
+      return next(
+        new ValidationError(`Champs manquants : ${missingFields.join(", ")}`)
+      );
+    }
+
+    if (!req.seller.id) {
+      return next(
+        new AuthError("Seul les vendeur sont authorize a creer un produit")
+      );
+    }
+
+    //slug checking
+    const existingSlug = await prisma.products.findUnique({
+      where: { slug },
+    });
+
+    if (existingSlug) {
+      return next(
+        new ValidationError(
+          "Ce slug existe déjà ! Veuillez en choisir un autre."
+        )
+      );
+    }
+
+    // CReate a new product
+    const createNewProduct = await prisma.products.create({
+      data: {
+        shopId: req.seller?.shop?.id,
+        title,
+        short_description,
+        detailed_description,
+        tag: Array.isArray(tag) ? tag : tag.split(","),
+        warranty,
+        slug,
+        brand,
+        category,
+        subCategory,
+        video_url,
+        sizes: sizes || [],
+        stock: parseInt(stock),
+        sale_price: parseFloat(sale_price),
+        regular_price: parseFloat(regular_price),
+        code_promo: promoCodes.map((codeId: string) => codeId),
+        images: {
+          create: images
+            .filter((img: any) => img && img.fileId && img.file_url)
+            .map((img: any) => ({
+              file_id: img.fileId,
+              url: img.file_url,
+            })),
+        },
+      },
+      include: { images: true },
+    });
+
+    res.status(201).json({
+      success: true,
+      createNewProduct,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// get all seller products
+export const getBoutiqueProducts = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const products = await prisma.products.findMany({
+      where: { shopId: req?.seller?.shop?.id },
+      include: { images: true },
+    });
+
+    return res.status(200).json({
+      success: true,
+      products,
     });
   } catch (error) {
     return next(error);

@@ -9,6 +9,8 @@ import axiosInstance from "@/utils/axiosinstance";
 import RichTextEditor from "../../../../../../../packages/RichTextEditor";
 import SizeSelector from "../../../../../../../packages/size-selector";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Page = () => {
   const {
@@ -23,6 +25,7 @@ const Page = () => {
   const [isChanged, setIsChanged] = useState(true);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   //get all categroies
   const { data, isLoading, isError } = useQuery({
@@ -126,8 +129,16 @@ const Page = () => {
   };
 
   // Handle product creattion for form submisssion
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    try {
+      setLoading(true);
+      await axiosInstance.post("/produit/api/creer-un-produit", data);
+      router.push("/tableaudebord/tous-les-produits");
+    } catch (error: any) {
+      toast.error(error?.data?.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveDraft = () => {};
@@ -188,17 +199,17 @@ const Page = () => {
               <Input
                 label="Titre produit"
                 placeholder="Enrer le titre du produit"
-                {...register("titre", {
+                {...register("title", {
                   required: "Le titre du produit est requis",
                 })}
               />
-              {errors.titre && (
+              {errors.title && (
                 <p className="text-red-500 text-sm">
-                  {String(errors.titre.message)}
+                  {String(errors.title.message)}
                 </p>
               )}
 
-              {/* description */}
+              {/* short description */}
               <div className="mt-2 sm:mt-3">
                 <Input
                   type="textarea"
@@ -206,7 +217,7 @@ const Page = () => {
                   cols={10}
                   label="Description produit * "
                   placeholder="Entrer une description du produit"
-                  {...register("description", {
+                  {...register("short_description", {
                     required: "Une description est requise",
                     validate: {
                       maxWords: (value: string) => {
@@ -219,9 +230,9 @@ const Page = () => {
                     },
                   })}
                 />
-                {errors.description && (
+                {errors.short_description && (
                   <p className="text-red-500 text-sm">
-                    {String(errors.description.message)}
+                    {String(errors.short_description.message)}
                   </p>
                 )}
               </div>
@@ -380,9 +391,9 @@ const Page = () => {
                 )}
               </div>
 
-              {/* Rich text with react-quill-new */}
+              {/* detailed description Rich text with react-quill-new */}
               <div className="mt-3 font-Poppins">
-                <label htmlFor="">Description détaillée *(Min 100 mots)</label>
+                <label>Description détaillée *(Min 100 mots)</label>
                 <Controller
                   name="detailed_description"
                   control={control}
@@ -592,10 +603,11 @@ const Page = () => {
         )}
 
         <button
-          type="button"
+          type="submit"
           className="bg-purple-700 text-white p-1 px-2 rounded-md font-medium"
+          disabled={loading}
         >
-          Creer Produit
+          {loading ? "Creattion en cours..." : "Créer"}
         </button>
       </div>
     </form>
