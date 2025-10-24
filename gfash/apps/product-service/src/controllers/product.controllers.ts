@@ -292,3 +292,39 @@ export const getBoutiqueProducts = async (
     return next(error);
   }
 };
+
+// delete products
+export const deleteProduct = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { productId } = req.params;
+    const sellerId = req?.seller?.shop?.id;
+
+    const product = await prisma.products.findUnique({
+      where: { id: productId },
+      select: { id: true, shopId: true },
+    });
+
+    if (!product) {
+      return next(new ValidationError("Produit non trouvé"));
+    }
+
+    if (product.shopId !== sellerId) {
+      return next(new ValidationError("Action non autorisée"));
+    }
+
+    // 🔥 Suppression directe du produit
+    await prisma.products.delete({
+      where: { id: productId },
+    });
+
+    return res.status(200).json({
+      message: "Produit supprimé avec succès.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
