@@ -3,13 +3,13 @@
 import PaymentLogo from "@/assets/svgs/payment-logo";
 import CreateBoutique from "@/shared/modules/auth/create-boutique";
 import { countries } from "@/utils/countries";
-
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import Input from "../../../../../../packages/input";
 
 // type FormData = {
 //   name: string;
@@ -139,7 +139,7 @@ const Page = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-10 min-h-screen bg-slate-900">
+    <div className="w-full flex flex-col items-center pt-10 bg-slate-800">
       {/* Stepper */}
       <div className="relative flex sm:flex-row items-center justify-between w-[90%] sm:w-[70%] md:w-[50%] mb-8 gap-6 sm:gap-0">
         {[1, 2, 3].map((step) => (
@@ -169,116 +169,117 @@ const Page = () => {
       </div>
 
       {/* steps content */}
-      <div className="w-[90%] md:w-[480px] p-8 mt-5 px-4 sm:px-8 shadow-2xl rounded-lg bg-white">
+      <div className="w-full h-[100vh] md:w-[520px] mt-5 px-4 sm:px-8 rounded-lg">
         {activeStep === 1 && (
           <>
             {!showOtp ? (
               <form onSubmit={handleSubmit(onSubmit)} className="mt-5">
-                <h3 className="text-center mb-8 font-medium text-2xl sm:text-4xl">
+                <h3 className="text-center mb-8 font-medium text-2xl sm:text-4xl text-gray-300">
                   Creer Mon Compte
                 </h3>
                 {/* name input */}
-                <label className="block text-xl mb-1 sm:text-base text-gray-700">
-                  Nom
-                </label>
-                <input
-                  type="text"
-                  placeholder="John"
-                  className="w-full border border-gray-400 rounded-xl p-6 px-3 mt-2 h-[40px] font-medium outline-none"
+                <Input
+                  label="Nom et prénom"
+                  placeholder="Jean Monroe"
+                  className="bg-transparent"
                   {...register("name", {
-                    required: "Votre nom est requis !",
+                    required: "Nom et prenom sont requis",
                   })}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 italic text-sm">
                     {String(errors.name.message)}
                   </p>
                 )}
 
                 {/* email input */}
-                <label className="block text-xl mt-1 sm:text-base text-gray-700">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="gfash@gmail.com"
-                  className="w-full border border-gray-400 p-6 px-3 mt-2 h-[40px] font-medium outline-none rounded-xl"
-                  {...register("email", {
-                    required: "L'Email est requis",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Address email invalide",
-                    },
-                  })}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm">
-                    {String(errors.email.message)}
-                  </p>
-                )}
+                <div className="mt-2">
+                  <Input
+                    label="Email"
+                    placeholder="gfash@gmail.com"
+                    className="bg-transparent mb-1"
+                    {...register("email", {
+                      required: "L'Email est requis",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Address email invalide",
+                      },
+                    })}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 italic text-sm">
+                      {String(errors.email.message)}
+                    </p>
+                  )}
+                </div>
 
                 {/* phone_number input */}
-                <label className="block text-xl mt-1 sm:text-base text-gray-700">
-                  Numero Telephone
-                </label>
-                <input
-                  type="teL"
-                  placeholder="+0000000000"
-                  className="w-full border border-gray-400 rounded-xl p-6 px-3 mt-2 h-[40px] font-medium outline-none"
-                  {...register("phone_number", {
-                    required: "Votre numero telephone est requis",
-                    pattern: {
-                      value: phone_numberRegex,
-                      message: "Format numero invalide",
-                    },
-                    maxLength: {
-                      value: 20,
-                      message: "Le numéro ne doit pas dépasser 20 caractères",
-                    },
-                    minLength: {
-                      value: 8,
-                      message: "Numéro trop court (min 8 chiffres)",
-                    },
-                  })}
-                />
-                {errors.phone_number && (
-                  <p className="text-red-500 text-sm">
-                    {String(errors.phone_number.message)}
-                  </p>
-                )}
+                <div className="mt-2">
+                  <Input
+                    label="Numero Telephone"
+                    placeholder="+000000000"
+                    className="bg-transparent mb-1"
+                    {...register("phone_number", {
+                      required: "Votre numero telephone est requis",
+                      pattern: {
+                        value: phone_numberRegex,
+                        message: "Format numero invalide",
+                      },
+                      maxLength: {
+                        value: 20,
+                        message: "Le numéro ne doit pas dépasser 20 caractères",
+                      },
+                      minLength: {
+                        value: 8,
+                        message: "Numéro trop court (min 8 chiffres)",
+                      },
+                    })}
+                  />
+                  {errors.phone_number && (
+                    <p className="text-red-500 italic text-sm">
+                      {String(errors.phone_number.message)}
+                    </p>
+                  )}
+                </div>
 
                 {/* country input */}
-                <label className="block text-xl mb-1 sm:text-base text-gray-700">
-                  Pays
-                </label>
-                <select
-                  className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
-                  {...register("country", {
-                    required: "Votre pays est requis!",
-                  })}
-                >
-                  <option value="">Sélectionnez votre pays</option>
-                  {countries.map((nation) => (
-                    <option key={nation.code} value={nation.code}>
-                      {nation.name}
+                <div className="mt-2 font-Poppins">
+                  <label className="block text-gray-300 text-base font-medium mb-1">
+                    Pays
+                  </label>
+                  <select
+                    className="w-full border-2 border-gray-400 rounded-md p-3 text-white bg-transparent outline-none"
+                    {...register("country", {
+                      required: "Votre pays est requis!",
+                    })}
+                  >
+                    <option value="" className="text-gray-600">
+                      Sélectionnez votre pays
                     </option>
-                  ))}
-                </select>
-                {errors.country && (
-                  <p className="text-red-500 text-sm">
-                    {String(errors.country.message)}
-                  </p>
-                )}
+                    {countries.map((nation) => (
+                      <option
+                        key={nation.code}
+                        value={nation.code}
+                        className="text-black"
+                      >
+                        {nation.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.country && (
+                    <p className="text-red-500 italic text-sm mt-1">
+                      {String(errors.country.message)}
+                    </p>
+                  )}
+                </div>
 
                 {/* password input */}
-                <label className="block text-xl mt-2 sm:text-base text-gray-700">
-                  Mot de passe
-                </label>
                 <div className="relative mt-2">
-                  <input
+                  <Input
+                    label="Mot de passe"
                     type={passwordVisible ? "text" : "password"}
-                    placeholder="votre de passe ici.."
-                    className="w-full border border-gray-400 rounded-xl p-6 px-3 h-[40px] text-black font-medium outline-none"
+                    placeholder="......"
+                    className="bg-transparent mb-1 "
                     {...register("password", {
                       required: "password is required",
                       minLength: {
@@ -289,17 +290,17 @@ const Page = () => {
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-400"
+                    className="absolute inset-y-0 top-5 right-3 flex items-center text-gray-400"
                     onClick={() => setPasswordVisible(!passwordVisible)}
                   >
                     {passwordVisible ? (
-                      <Eye color="black" />
+                      <Eye color="white" />
                     ) : (
-                      <EyeOff color="black" />
+                      <EyeOff color="white" />
                     )}
                   </button>
                   {errors.password && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 italic text-sm">
                       {String(errors.password.message)}
                     </p>
                   )}
@@ -327,11 +328,11 @@ const Page = () => {
                     </p>
                   )}
 
-                <p className="text-sm sm:text-base mt-5 text-black text-center">
+                <p className="text-sm sm:text-base mt-5 text-gray-200 text-center font-medium">
                   Avez-vous déja un compte ?
                   <Link
                     href={"/connexion"}
-                    className="text-black text-bold text-base sm:text-lg font-medium ml-1"
+                    className="text-purple-600 text-bold text-base sm:text-lg font-medium ml-1"
                   >
                     Connexion
                   </Link>
