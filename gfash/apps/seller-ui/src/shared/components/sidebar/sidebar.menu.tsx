@@ -12,6 +12,7 @@ const SidebarMenu = ({ title, children }: Props) => {
         {title}
       </h3>
       {children}
+      <hr className="text-gray-400 mb-3" />
     </div>
   );
 };

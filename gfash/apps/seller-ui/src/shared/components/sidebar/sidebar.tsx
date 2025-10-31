@@ -56,11 +56,11 @@ const SidebarWrapper = () => {
         <Box>
           <Link href={"/"} className="flex justify-center text-center gap-2">
             <Logo />
-            <Box className="text-xl font-medium text-purple-700">
+            <Box className="">
               <h3 className="text-xl font-medium text-[#ecedee]">
                 {seller?.shop?.name}
               </h3>
-              <h5 className="font-medium pl-2 text-xs text-[#ecedecf]">
+              <h5 className="font-medium pl-2 text-xs text-[#ecedee]">
                 {seller?.shop?.address}
               </h5>
             </Box>
@@ -90,7 +90,7 @@ const SidebarWrapper = () => {
             <SidebarMenu title="MENU PRINCIPAL">
               <SidebarItems
                 href="/tableaudebord/commandes"
-                title="List Commandes"
+                title="Commandes"
                 icons={
                   <ListOrdered
                     size={26}
@@ -106,7 +106,7 @@ const SidebarWrapper = () => {
 
               <SidebarItems
                 href="/tableaudebord/paiement"
-                title="Mes Paiements"
+                title="Paiements"
                 icons={
                   <HandCoins
                     size={26}
@@ -141,7 +141,7 @@ const SidebarWrapper = () => {
 
               <SidebarItems
                 href="/tableaudebord/tous-les-produits"
-                title="Tous mes Produits"
+                title="Mes Produits"
                 icons={
                   <PackageIcon
                     size={26}
@@ -160,7 +160,7 @@ const SidebarWrapper = () => {
             <SidebarMenu title="EVENEMENTS">
               <SidebarItems
                 href="/tableaudebord/creer-evenement"
-                title="Creer Evenements"
+                title="Creer Evenement"
                 icons={
                   <CalendarPlus
                     size={26}

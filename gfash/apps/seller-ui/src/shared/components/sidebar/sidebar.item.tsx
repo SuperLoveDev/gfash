@@ -16,8 +16,8 @@ const SidebarItems = ({ title, icons, isActive, href }: Props) => {
           isActive && "scale-[.98] bg-gray-800 fill-blue-200 hover:bg-gray-600"
         }`}
       >
-        <span>{icons}</span>
-        <h5 className="hidden sm:block text-slate-200 text-sm sm:text-lg">
+        <span className="hidden sm:block">{icons}</span>
+        <h5 className="text-slate-200 text-sm sm:text-lg font-medium hover:text-purple-600">
           {title}
         </h5>
       </div>

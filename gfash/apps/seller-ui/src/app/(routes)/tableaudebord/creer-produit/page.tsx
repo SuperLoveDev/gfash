@@ -607,7 +607,7 @@ const Page = () => {
           className="bg-purple-700 text-white p-1 px-2 rounded-md font-medium"
           disabled={loading}
         >
-          {loading ? "Creattion en cours..." : "Créer"}
+          {loading ? "Creation en cours..." : "Créer"}
         </button>
       </div>
     </form>
